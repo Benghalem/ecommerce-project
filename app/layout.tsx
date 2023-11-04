@@ -5,6 +5,10 @@ import { Nav } from './components/Nav'
 /* Instruments */
 import styles from './styles/layout.module.css'
 import './styles/globals.css'
+/* boostrap css */
+import 'bootstrap/dist/css/bootstrap.min.css';
+/* impoet components */
+import { Header } from './components/Header/header';
 
 export default function RootLayout(props: React.PropsWithChildren) {
   return (
@@ -12,11 +16,8 @@ export default function RootLayout(props: React.PropsWithChildren) {
       <html lang="en">
         <body>
           <section className={styles.container}>
-            <Nav />
-
-            <header className={styles.header}>
-              <img src="/logo.svg" className={styles.logo} alt="logo" />
-            </header>
+            <Header />
+          
 
             <main className={styles.main}>{props.children}</main>
 

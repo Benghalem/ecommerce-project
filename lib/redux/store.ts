@@ -7,14 +7,38 @@ import {
 } from 'react-redux'
 
 /* Instruments */
-import { reducer } from './rootReducer'
+import { rootReducer } from './rootReducer'
 import { middleware } from './middleware'
+import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer } from 'redux-persist' 
+import storage from 'redux-persist/lib/storage'
+import { encryptTransform } from 'redux-persist-transform-encrypt'
+import persistStore from 'redux-persist/es/persistStore'
+
+const persistConfig = {
+  key: 'root',
+  version:1,
+  storage,
+  transforms: [
+    encryptTransform({
+      secretKey: 'my-super-secret-key',
+      onError: function (error) {
+        // Handle the error.
+        console.log(error);
+      },
+    }),
+  ],
+}
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const reduxStore = configureStore({
-  reducer,
-  middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(middleware)
-  },
+  reducer:persistedReducer,
+  devTools: process.env.NODE_ENV !== 'production',
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 })
 export const useDispatch = () => useReduxDispatch<ReduxDispatch>()
 export const useSelector: TypedUseSelectorHook<ReduxState> = useReduxSelector
@@ -29,3 +53,4 @@ export type ReduxThunkAction<ReturnType = void> = ThunkAction<
   unknown,
   Action
 >
+export const presistor: any = persistStore(reduxStore);
